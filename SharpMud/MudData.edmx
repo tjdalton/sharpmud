@@ -1,0 +1,408 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="MudData.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2012" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityContainer Name="MudDataStoreContainer">
+    <EntitySet Name="Rooms" EntityType="MudData.Store.Rooms" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Mobs" EntityType="MudData.Store.Mobs" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Players" EntityType="MudData.Store.Players" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Exits" EntityType="MudData.Store.Exits" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Permissions" EntityType="MudData.Store.Permissions" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Directions" EntityType="MudData.Store.Directions" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="PermissionPlayer" EntityType="MudData.Store.PermissionPlayer" store:Type="Tables" Schema="dbo" />
+    <AssociationSet Name="MobRoom" Association="MudData.Store.MobRoom">
+      <End Role="Mob" EntitySet="Mobs" />
+      <End Role="Room" EntitySet="Rooms" />
+    </AssociationSet>
+    <AssociationSet Name="PlayerMob" Association="MudData.Store.PlayerMob">
+      <End Role="Player" EntitySet="Players" />
+      <End Role="Mob" EntitySet="Mobs" />
+    </AssociationSet>
+    <AssociationSet Name="FK_PermissionPlayer_Permission" Association="MudData.Store.FK_PermissionPlayer_Permission">
+      <End Role="Permission" EntitySet="Permissions" />
+      <End Role="PermissionPlayer" EntitySet="PermissionPlayer" />
+    </AssociationSet>
+    <AssociationSet Name="FK_PermissionPlayer_Player" Association="MudData.Store.FK_PermissionPlayer_Player">
+      <End Role="Player" EntitySet="Players" />
+      <End Role="PermissionPlayer" EntitySet="PermissionPlayer" />
+    </AssociationSet>
+    <AssociationSet Name="ExitDirection" Association="MudData.Store.ExitDirection">
+      <End Role="Exit" EntitySet="Exits" />
+      <End Role="Direction" EntitySet="Directions" />
+    </AssociationSet>
+    <AssociationSet Name="ExitRoom" Association="MudData.Store.ExitRoom">
+      <End Role="Exit" EntitySet="Exits" />
+      <End Role="Room" EntitySet="Rooms" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="Rooms">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Description" Type="nvarchar(max)" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Mobs">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Description" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Room_Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Players">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Username" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Password" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="LastLogin" Type="datetime" Nullable="false" />
+    <Property Name="Firstname" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Lastname" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Status" Type="int" Nullable="false" />
+    <Property Name="Email" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Mob_Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Exits">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="To" Type="int" Nullable="false" />
+    <Property Name="Direction_Id" Type="int" Nullable="false" />
+    <Property Name="Room_Id" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Permissions">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Directions">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="From" Type="nvarchar(max)" Nullable="false" />
+  </EntityType>
+  <EntityType Name="PermissionPlayer">
+    <Key>
+      <PropertyRef Name="Permissions_Id" />
+      <PropertyRef Name="Players_Id" />
+    </Key>
+    <Property Name="Permissions_Id" Type="int" Nullable="false" />
+    <Property Name="Players_Id" Type="int" Nullable="false" />
+  </EntityType>
+  <Association Name="MobRoom">
+    <End Role="Mob" Type="MudData.Store.Mobs" Multiplicity="*" />
+    <End Role="Room" Type="MudData.Store.Rooms" Multiplicity="1" />
+    <ReferentialConstraint>
+      <Principal Role="Room">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Mob">
+        <PropertyRef Name="Room_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="PlayerMob">
+    <End Role="Player" Type="MudData.Store.Players" Multiplicity="*" />
+    <End Role="Mob" Type="MudData.Store.Mobs" Multiplicity="1" />
+    <ReferentialConstraint>
+      <Principal Role="Mob">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Player">
+        <PropertyRef Name="Mob_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="ExitDirection">
+    <End Role="Exit" Type="MudData.Store.Exits" Multiplicity="*" />
+    <End Role="Direction" Type="MudData.Store.Directions" Multiplicity="1" />
+    <ReferentialConstraint>
+      <Principal Role="Direction">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Exit">
+        <PropertyRef Name="Direction_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="ExitRoom">
+    <End Role="Exit" Type="MudData.Store.Exits" Multiplicity="*" />
+    <End Role="Room" Type="MudData.Store.Rooms" Multiplicity="1" />
+    <ReferentialConstraint>
+      <Principal Role="Room">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Exit">
+        <PropertyRef Name="Room_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_PermissionPlayer_Permission">
+    <End Role="Permission" Type="MudData.Store.Permissions" Multiplicity="1" />
+    <End Role="PermissionPlayer" Type="MudData.Store.PermissionPlayer" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Permission">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="PermissionPlayer">
+        <PropertyRef Name="Permissions_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_PermissionPlayer_Player">
+    <End Role="PermissionPlayer" Type="MudData.Store.PermissionPlayer" Multiplicity="*" />
+    <End Role="Player" Type="MudData.Store.Players" Multiplicity="1" />
+    <ReferentialConstraint>
+      <Principal Role="Player">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="PermissionPlayer">
+        <PropertyRef Name="Players_Id" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema xmlns="http://schemas.microsoft.com/ado/2009/11/edm" xmlns:cg="http://schemas.microsoft.com/ado/2006/04/codegeneration" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" Namespace="MudData" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" annotation:UseStrongSpatialTypes="false">
+        <EntityContainer Name="MudDataContainer" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Rooms" EntityType="MudData.Room" />
+          <EntitySet Name="Mobs" EntityType="MudData.Mob" />
+          <AssociationSet Name="MobRoom" Association="MudData.MobRoom">
+            <End Role="Mob" EntitySet="Mobs" />
+            <End Role="Room" EntitySet="Rooms" />
+          </AssociationSet>
+          <EntitySet Name="Players" EntityType="MudData.Player" />
+          <AssociationSet Name="PlayerMob" Association="MudData.PlayerMob">
+            <End Role="Player" EntitySet="Players" />
+            <End Role="Mob" EntitySet="Mobs" />
+          </AssociationSet>
+          <EntitySet Name="Exits" EntityType="MudData.Exit" />
+          <EntitySet Name="Permissions" EntityType="MudData.Permission" />
+          <AssociationSet Name="PermissionPlayer" Association="MudData.PermissionPlayer">
+            <End Role="Permission" EntitySet="Permissions" />
+            <End Role="Player" EntitySet="Players" />
+          </AssociationSet>
+          <EntitySet Name="Directions" EntityType="MudData.Direction" />
+          <AssociationSet Name="ExitDirection" Association="MudData.ExitDirection">
+            <End Role="Exit" EntitySet="Exits" />
+            <End Role="Direction" EntitySet="Directions" />
+          </AssociationSet>
+          <AssociationSet Name="ExitRoom" Association="MudData.ExitRoom">
+            <End Role="Exit" EntitySet="Exits" />
+            <End Role="Room" EntitySet="Rooms" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Room">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Description" Type="String" Nullable="false" />
+          <NavigationProperty Name="Mobs" Relationship="MudData.MobRoom" FromRole="Room" ToRole="Mob" />
+          <NavigationProperty Name="Exits" Relationship="MudData.ExitRoom" FromRole="Room" ToRole="Exit" />
+        </EntityType>
+        <EntityType Name="Mob">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Description" Type="String" Nullable="false" />
+          <NavigationProperty Name="Room" Relationship="MudData.MobRoom" FromRole="Mob" ToRole="Room" />
+          <NavigationProperty Name="Player" Relationship="MudData.PlayerMob" FromRole="Mob" ToRole="Player" />
+        </EntityType>
+        <Association Name="MobRoom">
+          <End Type="MudData.Mob" Role="Mob" Multiplicity="*" />
+          <End Type="MudData.Room" Role="Room" Multiplicity="1" />
+        </Association>
+        <EntityType Name="Player">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Username" Type="String" Nullable="false" />
+          <Property Name="Password" Type="String" Nullable="false" />
+          <Property Name="LastLogin" Type="DateTime" Nullable="false" />
+          <Property Name="Firstname" Type="String" Nullable="false" />
+          <Property Name="Lastname" Type="String" Nullable="false" />
+          <NavigationProperty Name="Mob" Relationship="MudData.PlayerMob" FromRole="Player" ToRole="Mob" />
+          <NavigationProperty Name="Permissions" Relationship="MudData.PermissionPlayer" FromRole="Player" ToRole="Permission" />
+          <Property Name="Status" Type="Int32" Nullable="false" />
+          <Property Name="Email" Type="String" Nullable="false" />
+        </EntityType>
+        <Association Name="PlayerMob">
+          <End Type="MudData.Player" Role="Player" Multiplicity="1" />
+          <End Type="MudData.Mob" Role="Mob" Multiplicity="1" />
+        </Association>
+        <EntityType Name="Exit">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <NavigationProperty Name="Direction" Relationship="MudData.ExitDirection" FromRole="Exit" ToRole="Direction" />
+          <NavigationProperty Name="Room" Relationship="MudData.ExitRoom" FromRole="Exit" ToRole="Room" />
+          <Property Name="To" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Permission">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" />
+          <NavigationProperty Name="Players" Relationship="MudData.PermissionPlayer" FromRole="Permission" ToRole="Player" />
+        </EntityType>
+        <Association Name="PermissionPlayer">
+          <End Type="MudData.Permission" Role="Permission" Multiplicity="*" />
+          <End Type="MudData.Player" Role="Player" Multiplicity="*" />
+        </Association>
+        <EntityType Name="Direction">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" />
+          <NavigationProperty Name="Exits" Relationship="MudData.ExitDirection" FromRole="Direction" ToRole="Exit" />
+          <Property Name="From" Type="String" Nullable="false" />
+        </EntityType>
+        <Association Name="ExitDirection">
+          <End Type="MudData.Exit" Role="Exit" Multiplicity="*" />
+          <End Type="MudData.Direction" Role="Direction" Multiplicity="1" />
+        </Association>
+        <Association Name="ExitRoom">
+          <End Type="MudData.Exit" Role="Exit" Multiplicity="*" />
+          <End Type="MudData.Room" Role="Room" Multiplicity="1" />
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+    <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="MudDataStoreContainer" CdmEntityContainer="MudDataContainer">
+    <EntitySetMapping Name="Rooms">
+      <EntityTypeMapping TypeName="IsTypeOf(MudData.Room)">
+        <MappingFragment StoreEntitySet="Rooms">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Description" ColumnName="Description" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Mobs">
+      <EntityTypeMapping TypeName="IsTypeOf(MudData.Mob)">
+        <MappingFragment StoreEntitySet="Mobs">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Description" ColumnName="Description" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Players">
+      <EntityTypeMapping TypeName="IsTypeOf(MudData.Player)">
+        <MappingFragment StoreEntitySet="Players">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Username" ColumnName="Username" />
+          <ScalarProperty Name="Password" ColumnName="Password" />
+          <ScalarProperty Name="LastLogin" ColumnName="LastLogin" />
+          <ScalarProperty Name="Firstname" ColumnName="Firstname" />
+          <ScalarProperty Name="Lastname" ColumnName="Lastname" />
+          <ScalarProperty Name="Status" ColumnName="Status" />
+          <ScalarProperty Name="Email" ColumnName="Email" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Exits">
+      <EntityTypeMapping TypeName="IsTypeOf(MudData.Exit)">
+        <MappingFragment StoreEntitySet="Exits">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="To" ColumnName="To" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Permissions">
+      <EntityTypeMapping TypeName="IsTypeOf(MudData.Permission)">
+        <MappingFragment StoreEntitySet="Permissions">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Directions">
+      <EntityTypeMapping TypeName="IsTypeOf(MudData.Direction)">
+        <MappingFragment StoreEntitySet="Directions">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="From" ColumnName="From" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <AssociationSetMapping Name="MobRoom" TypeName="MudData.MobRoom" StoreEntitySet="Mobs">
+      <EndProperty Name="Room">
+        <ScalarProperty Name="Id" ColumnName="Room_Id" />
+      </EndProperty>
+      <EndProperty Name="Mob">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="PlayerMob" TypeName="MudData.PlayerMob" StoreEntitySet="Players">
+      <EndProperty Name="Mob">
+        <ScalarProperty Name="Id" ColumnName="Mob_Id" />
+      </EndProperty>
+      <EndProperty Name="Player">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="PermissionPlayer" TypeName="MudData.PermissionPlayer" StoreEntitySet="PermissionPlayer">
+      <EndProperty Name="Permission">
+        <ScalarProperty Name="Id" ColumnName="Permissions_Id" />
+      </EndProperty>
+      <EndProperty Name="Player">
+        <ScalarProperty Name="Id" ColumnName="Players_Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="ExitDirection" TypeName="MudData.ExitDirection" StoreEntitySet="Exits">
+      <EndProperty Name="Direction">
+        <ScalarProperty Name="Id" ColumnName="Direction_Id" />
+      </EndProperty>
+      <EndProperty Name="Exit">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+    <AssociationSetMapping Name="ExitRoom" TypeName="MudData.ExitRoom" StoreEntitySet="Exits">
+      <EndProperty Name="Room">
+        <ScalarProperty Name="Id" ColumnName="Room_Id" />
+      </EndProperty>
+      <EndProperty Name="Exit">
+        <ScalarProperty Name="Id" ColumnName="Id" />
+      </EndProperty>
+    </AssociationSetMapping>
+  </EntityContainerMapping>
+</Mapping></edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <edmx:Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </edmx:Connection>
+    <edmx:Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="True" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+        <DesignerProperty Name="UseLegacyProvider" Value="False" />
+      </DesignerInfoPropertySet>
+    </edmx:Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>
