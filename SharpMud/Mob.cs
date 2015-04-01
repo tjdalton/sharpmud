@@ -9,9 +9,6 @@
 
 namespace SharpMud
 {
-    using System;
-    using System.Collections.Generic;
-    
     public partial class Mob
     {
         public int Id { get; set; }

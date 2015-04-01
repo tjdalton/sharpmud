@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SharpMud.Commands
 {
 	public class Create : ICommand
 	{
-		private string[] _accessWords = { "CREATE" };
+		private readonly string[] _accessWords = { "CREATE" };
 		public string[] AccessWords
 		{
 			get
@@ -32,8 +30,8 @@ namespace SharpMud.Commands
             {
                 Room r = new Room();
                 r.Description = String.Join(" ", line.Skip(1).Take(line.Count));
-                c.DB.Rooms.Add(r);
-                c.DB.SaveChanges();
+                c.Db.Rooms.Add(r);
+                c.Db.SaveChanges();
                 c.WriteLine(String.Format("Room {0} has been created", r.Id));
 
             }
@@ -45,7 +43,7 @@ namespace SharpMud.Commands
         {
             get
             {
-                Permission[] p = { World.DB.Permissions.GetByName("none"), World.DB.Permissions.GetByName("all") };
+                Permission[] p = { World.Db.Permissions.GetByName("none"), World.Db.Permissions.GetByName("all") };
                 return p;
             }
         }

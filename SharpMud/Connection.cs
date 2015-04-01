@@ -1,25 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Entity;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SharpMud
 {
     public class Connection
     {
-        World world;
+        readonly World _world;
         public Connection(string id, World w, TcpClient t)
         {
-            ID = id;
-            world = w;
+            Id = id;
+            _world = w;
             ClientSocket = t;
         }
 
-        public string ID
+        public string Id
         {
             get;
             set;
@@ -55,15 +50,15 @@ namespace SharpMud
         {
             get
             {
-                return world;
+                return _world;
             }
         }
 
-        public MudDataContainer DB
+        public MudDataContainer Db
         {
             get
             {
-                return World.DB;
+                return World.Db;
             }
         }
 
@@ -77,7 +72,7 @@ namespace SharpMud
         {
             get
             {
-                var x = from p in DB.Players
+                var x = from p in Db.Players
                         where p.Id == Player.Id
                         select p.Mob.Room;
                 return x.First();
@@ -90,27 +85,27 @@ namespace SharpMud
             set;
         }
 
-        private SocketEvent _SEvent;
+        private SocketEvent _sEvent;
         public SocketEvent SocketEvent
         {
             get
             {
-                return _SEvent;
+                return _sEvent;
             }
             set
             {
-                _SEvent = value;
-                _SEvent.lineReceived += SEvent_lineReceived;
+                _sEvent = value;
+                _sEvent.LineReceived += SEvent_lineReceived;
             }
         }
 
         private void SEvent_lineReceived(string line)
         {
             var words = line.Split(' ');
-            var n = words.Skip(1).Take(words.Count() - 1).ToList<string>();
-            var cmd = world.CallCommand(words[0].ToUpper());
+            var n = words.Skip(1).Take(words.Count() - 1).ToList();
+            var cmd = _world.CallCommand(words[0].ToUpper());
             LastCommand = words[0].ToUpper();
-            if (cmd != null && this.Player.Permissions.HasAny(cmd.PermissionsRequired))
+            if (cmd != null && Player.Permissions.HasAny(cmd.PermissionsRequired))
                 cmd.Execute(this, n);
             else
                 WriteLine("Unknown Command");

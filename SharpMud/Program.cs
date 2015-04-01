@@ -1,98 +1,69 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
-using System.Reflection;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace SharpMud
 {
     class Program
     {
-        static World world;
-        static void Main(string[] args)
+        static World _world;
+        static void Main()
         {
-            IPAddress i = IPAddress.Any;
-            TcpListener serverSocket = new TcpListener(i, 8888);
-            TcpClient clientSocket = default(TcpClient);
-            int counter = 0;
+            var i = IPAddress.Any;
+            var serverSocket = new TcpListener(i, 8888);
 
             serverSocket.Start();
             Console.WriteLine(" >> " + "Server Started");
-            world = new World();
-            initDatabase(world);
-            counter = 0;
+            _world = new World();
+            InitDatabase();
+            var counter = 0;
             while (true)
             {
                 counter += 1;
-                clientSocket = serverSocket.AcceptTcpClient();
+                var clientSocket = serverSocket.AcceptTcpClient();
                 Console.WriteLine(" >> " + "Client No:" + Convert.ToString(counter) + " started!");
-                handleClient client = new handleClient(world);
+                var client = new HandleClient(_world);
                 
-                client.startClient(clientSocket, Convert.ToString(counter));
+                client.StartClient(clientSocket, Convert.ToString(counter));
             }
 
+            // ReSharper disable once FunctionNeverReturns
         }
 
-        public static void initDatabase(World w)
+        public static void InitDatabase()
         {
-            w = new World();
-            //var n = World.DB.Rooms.FirstOrDefault(u => u.Id == 1);
-            var n = World.DB.Rooms.FirstOrDefault(u => u.Id == 1);
-            if (n == null)
-            {
-                Room r = new Room();
-                r.Description = "A featureless grey room";
-                World.DB.Rooms.Add(r);
-                Direction d = new Direction();
-                d.Name = "ne";
-                d.From = "sw";
-                World.DB.Directions.Add(d);
-                d = new Direction();
-                d.Name = "sw";
-                d.From = "ne";
-                World.DB.Directions.Add(d);
-                d = new Direction();
-                d.Name = "nw";
-                d.From = "se";
-                World.DB.Directions.Add(d);
-                d = new Direction();
-                d.Name = "n";
-                d.From = "s";
-                World.DB.Directions.Add(d);
-                d = new Direction();
-                d.Name = "s";
-                d.From = "n";
-                World.DB.Directions.Add(d);
-                d = new Direction();
-                d.Name = "e";
-                d.From = "w";
-                World.DB.Directions.Add(d);
-                d = new Direction();
-                d.Name = "w";
-                d.From = "e";
-                World.DB.Directions.Add(d);
-                d = new Direction();
-                d.Name = "up";
-                d.From = "down";
-                World.DB.Directions.Add(d);
-                d = new Direction();
-                d.Name = "down";
-                d.From = "up";
-                World.DB.Directions.Add(d);
-                Permission a = new Permission();
-                a.Name = "none";
-                World.DB.Permissions.Add(a);
-                a = new Permission();
-                a.Name = "all";
-                World.DB.Permissions.Add(a);
-                World.DB.SaveChanges();
-            }
-
+            _world = new World();
+            //var n = World.Db.Rooms.FirstOrDefault(u => u.Id == 1);
+            var n = World.Db.Rooms.FirstOrDefault(u => u.Id == 1);
+            if (n != null) return;
+            var r = new Room {Description = "A featureless grey room"};
+            World.Db.Rooms.Add(r);
+            var d = new Direction {Name = "ne", From = "sw"};
+            World.Db.Directions.Add(d);
+            d = new Direction {Name = "sw", From = "ne"};
+            World.Db.Directions.Add(d);
+            d = new Direction {Name = "nw", From = "se"};
+            World.Db.Directions.Add(d);
+            d = new Direction {Name = "n", From = "s"};
+            World.Db.Directions.Add(d);
+            d = new Direction {Name = "s", From = "n"};
+            World.Db.Directions.Add(d);
+            d = new Direction {Name = "e", From = "w"};
+            World.Db.Directions.Add(d);
+            d = new Direction {Name = "w", From = "e"};
+            World.Db.Directions.Add(d);
+            d = new Direction {Name = "up", From = "down"};
+            World.Db.Directions.Add(d);
+            d = new Direction {Name = "down", From = "up"};
+            World.Db.Directions.Add(d);
+            var a = new Permission {Name = "none"};
+            World.Db.Permissions.Add(a);
+            a = new Permission {Name = "all"};
+            World.Db.Permissions.Add(a);
+            World.Db.SaveChanges();
         }
     }
 
@@ -103,112 +74,66 @@ namespace SharpMud
         Playing
     }
     //Class to handle each client request separatly
-    public class handleClient
+    public class HandleClient
     {
-        TcpClient clientSocket;
-        string clNo;
-        Connection player;
-        World world;
-        ChatState state;
-        string username;
+        TcpClient _clientSocket;
+        Connection _player;
+        readonly World _world;
+        ChatState _state;
+        string _username;
 
 
-        public handleClient(World w)
+        public HandleClient(World w)
         {
-            world = w;
-            state = ChatState.Login;
+            _world = w;
+            _state = ChatState.Login;
         }
-        public void startClient(TcpClient inClientSocket, string clineNo)
+
+        public void StartClient(TcpClient inClientSocket, string clineNo)
         {
-            this.clientSocket = inClientSocket;
-            this.clNo = clineNo;
-            player = new Connection(clineNo, world, inClientSocket);
-            player.SocketEvent = new SocketEvent();
-            world.AddConnection(player);
-            Thread ctThread = new Thread(doChat);
+            _clientSocket = inClientSocket;
+            _player = new Connection(clineNo, _world, inClientSocket) {SocketEvent = new SocketEvent()};
+            _world.AddConnection(_player);
+            var ctThread = new Thread(DoChat);
             ctThread.Start();
         }
-        private void doChat()
+
+        private void DoChat()
         {
-            string dataFromClient;
             while ((true))
             {
                 try
                 {
-                    NetworkStream networkStream = clientSocket.GetStream();
-                    StreamReader reader = new StreamReader(networkStream);
-                    player.Stream = networkStream;
-                    if (state == ChatState.Login)
+                    var networkStream = _clientSocket.GetStream();
+                    var reader = new StreamReader(networkStream);
+                    _player.Stream = networkStream;
+                    if (_state == ChatState.Login)
                     {
-                        StreamWriter writer = new StreamWriter(networkStream);
-                        writer.WriteLine("What is your username?");
-                        writer.Flush();
-                        dataFromClient = reader.ReadLine();
-                        username = dataFromClient;
-                        Player p;
+                        var writer = GetUserName(networkStream, reader);
                         try
                         {
-                            p = World.DB.Players.First(u => u.Username == username);
-                            player.Player = p;
-                           // World.DB.Permissions.getByName("all").Players.Add(p);
-                            World.DB.SaveChanges();
-                            state = ChatState.Playing;
-                            world.EnterRoom(player,String.Empty);
+                            PlayerLogin();
                         }
-                        catch(Exception e)
+                        catch
                         {
-                            p = new Player();
-                            p.Username = username;
-                            writer.WriteLine("What is your password");
-                            writer.Flush();
-                            p.Password = reader.ReadLine();
-                            writer.WriteLine("What is your email");
-                            writer.Flush();
-                            p.Email = reader.ReadLine();
-                            p.Status = 1;
-                            writer.WriteLine("What is your first name?");
-                            writer.Flush();
-                            p.Firstname = reader.ReadLine();
-                            writer.WriteLine("What is your last name?");
-                            writer.Flush();
-                            World.DB.Permissions.GetByName("all").Players.Add(p);
-                            p.Lastname = reader.ReadLine();
-                            p.LastLogin = DateTime.Now;
-                            var startRoom = World.DB.Rooms.FirstOrDefault(u => u.Id == 1);
-                            Mob m = new Mob();
-                            m.Description = "A Player";
-                            m.Room = startRoom;
-                            World.DB.Mobs.Add(m);
-                            startRoom.Mobs.Add(m);
-                            p.Mob = m;
-                            World.DB.Players.Add(p);
-							player.Player = p;
-							World.DB.SaveChanges();
-                            state = ChatState.Playing;
-							world.EnterRoom(player, String.Empty);
-                            
+                            NewPlayer(writer, reader);
                         }
-
-                        
                     }
 
-                    if (state == ChatState.Playing)
+                    if (_state != ChatState.Playing) continue;
+                    var dataFromClient = reader.ReadLine();
+                    try
                     {
-                        dataFromClient = reader.ReadLine();
-                        try
-                        {
-                            player.SocketEvent.ProcessLine(dataFromClient.Replace("\0", String.Empty));
-                        }
+                        if (dataFromClient != null)
+                            _player.SocketEvent.ProcessLine(dataFromClient.Replace("\0", String.Empty));
+                    }
                          
-                        catch(NullReferenceException)
-                        {
-                            clientSocket.Close();
-                            world.RemoveConnection(player);
-                            break;
-                        }
-
+                    catch(NullReferenceException)
+                    {
+                        _clientSocket.Close();
+                        _world.RemoveConnection(_player);
+                        break;
                     }
-                        
                 }
                 catch(ObjectDisposedException)
                 {
@@ -216,9 +141,58 @@ namespace SharpMud
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(" >> " + ex.ToString());
+                    Console.WriteLine(" >> " + ex);
                 }
             }
+        }
+
+        private void PlayerLogin()
+        {
+            var p = World.Db.Players.First(u => u.Username == _username);
+            _player.Player = p;
+            World.Db.SaveChanges();
+            _state = ChatState.Playing;
+            _world.EnterRoom(_player, String.Empty);
+        }
+
+        private StreamWriter GetUserName(NetworkStream networkStream, StreamReader reader)
+        {
+            var writer = new StreamWriter(networkStream);
+            writer.WriteLine("What is your username?");
+            writer.Flush();
+            var dataFromClient = reader.ReadLine();
+            _username = dataFromClient;
+            return writer;
+        }
+
+        private void NewPlayer(StreamWriter writer, StreamReader reader)
+        {
+            var p = new Player {Username = _username};
+            writer.WriteLine("What is your password");
+            writer.Flush();
+            p.Password = reader.ReadLine();
+            writer.WriteLine("What is your email");
+            writer.Flush();
+            p.Email = reader.ReadLine();
+            p.Status = 1;
+            writer.WriteLine("What is your first name?");
+            writer.Flush();
+            p.Firstname = reader.ReadLine();
+            writer.WriteLine("What is your last name?");
+            writer.Flush();
+            World.Db.Permissions.GetByName("all").Players.Add(p);
+            p.Lastname = reader.ReadLine();
+            p.LastLogin = DateTime.Now;
+            var startRoom = World.Db.Rooms.FirstOrDefault(u => u.Id == 1);
+            var m = new Mob {Description = "A Player", Room = startRoom};
+            World.Db.Mobs.Add(m);
+            if (startRoom != null) startRoom.Mobs.Add(m);
+            p.Mob = m;
+            World.Db.Players.Add(p);
+            _player.Player = p;
+            World.Db.SaveChanges();
+            _state = ChatState.Playing;
+            _world.EnterRoom(_player, String.Empty);
         }
     }
 
@@ -226,13 +200,13 @@ namespace SharpMud
     {
         public delegate void LineReceivedHandler(string line);
 
-        public event LineReceivedHandler lineReceived;
+        public event LineReceivedHandler LineReceived;
 
         public void ProcessLine(string line)
         {
-                if (lineReceived != null)
+                if (LineReceived != null)
                 {
-                    lineReceived(line);
+                    LineReceived(line);
                 }
         }
     }

@@ -7,11 +7,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System.Collections.Generic;
+
 namespace SharpMud
 {
-    using System;
-    using System.Collections.Generic;
-    
     public partial class Permission
     {
         public Permission()

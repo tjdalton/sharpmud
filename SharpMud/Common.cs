@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SharpMud
 {
@@ -12,12 +9,7 @@ namespace SharpMud
     {
         public static bool HasAny<T>(this ICollection<T> array, T[] p)
         {
-            foreach (var item in p)
-            {
-                if (array.Contains(item))
-                    return true;
-            }
-            return false;
+            return p.Any(item => array.Contains(item));
         }
 
         public static Permission GetByName(this DbSet<Permission> set, string s)

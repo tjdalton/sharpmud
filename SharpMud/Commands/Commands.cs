@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SharpMud.Commands
 {
     public class Commands : ICommand
     {
-        private string[] _accessWords = { "COMMANDS" };
+        private readonly string[] _accessWords = { "COMMANDS" };
         public string[] AccessWords
         {
             get
@@ -27,8 +25,8 @@ namespace SharpMud.Commands
 
 		public void Execute(Connection c, List<string> line)
         {
-            c.WriteLine("Commands available: ");
-            c.WriteLine(String.Join(", ", c.World.Commands.Where(u=>c.Player.Permissions.HasAny(c.World.CallCommand(u).PermissionsRequired))));
+            c.WriteLine("UsableCommands available: ");
+            c.WriteLine(String.Join(", ", c.World.UsableCommands.Where(u=>c.Player.Permissions.HasAny(c.World.CallCommand(u).PermissionsRequired))));
         }
 
 
@@ -36,7 +34,7 @@ namespace SharpMud.Commands
         {
             get
             {
-                Permission[] p = { World.DB.Permissions.GetByName("none"), World.DB.Permissions.GetByName("all") };
+                Permission[] p = { World.Db.Permissions.GetByName("none"), World.Db.Permissions.GetByName("all") };
                 return p;
             }
         }

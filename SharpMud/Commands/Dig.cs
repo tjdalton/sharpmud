@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SharpMud.Commands
 {
     public class Dig : ICommand
     {
-        private string[] _accessWords = { "DIG" };
+        private readonly string[] _accessWords = { "DIG" };
         public string[] AccessWords
         {
             get
@@ -27,11 +25,9 @@ namespace SharpMud.Commands
 
 		public void Execute(Connection c, List<string> line)
         {
-            Room newroom;
-            Room curroom;
-			if (line.Count < 2)
+		    if (line.Count < 2)
 			{
-				c.WriteLine(this.Help);
+				c.WriteLine(Help);
 				return;
 			}
             var dir = line.First();
@@ -40,40 +36,33 @@ namespace SharpMud.Commands
             
             try
             {
-               // var n = c.DB.Rooms.First(u => u.Id == c.Room.Id && u.Exits.First(x=>x.Direction.Name == dir));
-                var tmp = c.Player.Mob.Room.Exits.First(u => u.Direction.Name == dir);
+               // var n = c.Db.Rooms.First(u => u.Id == c.Room.Id && u.Exits.First(x=>x.Direction.Name == dir));
             }
             catch (Exception)
             {
 
                 try
                 {
-                    newroom = c.DB.Rooms.First(u => u.Id == rid);
-                    curroom = c.Room;
-                    //RoomExit re = new RoomExit();
-                   // re.room = newroom.id;
-                   // re.from = curroom.id;
+                    var newroom = c.Db.Rooms.First(u => u.Id == rid);
+                    var curroom = c.Room;
                     try
                     {
-                       // re.REDirection = c.DB.Directions.First(u => u.from == dir);
-                       // c.DB.RoomExits.Add(re);
-                       // RoomExit re2 = new RoomExit();
-                       // re2.room = curroom.Id;
-                       // re2.from = newroom.Id;
-                       // re2.REDirection = c.DB.Directions.First(u => u.to == dir);
-                       // c.DB.RoomExits.Add(re2);
-                        var x = new Exit();
-                        x.Room = curroom;
-                        x.To = newroom.Id;
-                        x.Direction = c.DB.Directions.First(u => u.Name == dir);
+                        var x = new Exit
+                        {
+                            Room = curroom,
+                            To = newroom.Id,
+                            Direction = c.Db.Directions.First(u => u.Name == dir)
+                        };
                         curroom.Exits.Add(x);
-                        x = new Exit();
-                        x.Room = newroom;
-                        x.To = curroom.Id;
-                        x.Direction = c.DB.Directions.First(u => u.From == dir);
+                        x = new Exit
+                        {
+                            Room = newroom,
+                            To = curroom.Id,
+                            Direction = c.Db.Directions.First(u => u.From == dir)
+                        };
                         newroom.Exits.Add(x);
-                        c.DB.SaveChanges();
-                        c.WriteLine(String.Format("An exit to {0} leading to room {1} has been created", c.DB.Directions.First(u => u.Name == dir).Name, rid));
+                        c.Db.SaveChanges();
+                        c.WriteLine(String.Format("An exit to {0} leading to room {1} has been created", c.Db.Directions.First(u => u.Name == dir).Name, rid));
                     }
                     catch (InvalidOperationException)
                     {
@@ -96,7 +85,7 @@ namespace SharpMud.Commands
         {
             get
             {
-                Permission[] p = { World.DB.Permissions.GetByName("dig"), World.DB.Permissions.GetByName("all") };
+                Permission[] p = { World.Db.Permissions.GetByName("dig"), World.Db.Permissions.GetByName("all") };
                 return p;
             }
         }

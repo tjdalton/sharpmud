@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SharpMud.Commands
 {
     public class Modify : ICommand
     {
-        private string[] _accessWords = { "MODIFY", "MOD" };
+        private readonly string[] _accessWords = { "MODIFY", "MOD" };
         public string[] AccessWords
         {
            get { return _accessWords; }
@@ -18,7 +15,7 @@ namespace SharpMud.Commands
         {
             get
             {
-                Permission[] p = { World.DB.Permissions.GetByName("modify"), World.DB.Permissions.GetByName("all") };
+                Permission[] p = { World.Db.Permissions.GetByName("modify"), World.Db.Permissions.GetByName("all") };
                 return p;
             }
         }

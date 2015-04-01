@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SharpMud.Commands
+﻿namespace SharpMud.Commands
 {
     public class SouthEast : Move,ICommand
     {
-        private string[] _accessWords = { "SOUTHEAST", "SE" };
+        private readonly string[] _accessWords = { "SOUTHEAST", "SE" };
         public string[] AccessWords
         {
             get { return _accessWords; }
@@ -25,7 +19,7 @@ namespace SharpMud.Commands
         {
             get
             {
-                Permission[] p = { World.DB.Permissions.GetByName("none"), World.DB.Permissions.GetByName("all") };
+                Permission[] p = { World.Db.Permissions.GetByName("none"), World.Db.Permissions.GetByName("all") };
                 return p;
             }
         }

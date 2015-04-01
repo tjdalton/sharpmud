@@ -7,11 +7,11 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+
 namespace SharpMud
 {
-    using System;
-    using System.Collections.Generic;
-    
     public partial class Player
     {
         public Player()
@@ -22,7 +22,7 @@ namespace SharpMud
         public int Id { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
-        public System.DateTime LastLogin { get; set; }
+        public DateTime LastLogin { get; set; }
         public string Firstname { get; set; }
         public string Lastname { get; set; }
         public int Status { get; set; }
